@@ -1,23 +1,11 @@
-import threading
 from pymavlink import mavutil
-import mavsdk
-import time
-import math
-
-from gtts import gTTS
-import speech_recognition as sr
-import os
-import time
-import pyaudio
+from speech_recognition import Microphone, Recognizer, UnknownValueError, RequestError, WaitTimeoutError
+from time import sleep, time
 import collections
 from collections.abc import MutableMapping
 collections.MutableMapping = collections.abc.MutableMapping
-from dronekit import connect, VehicleMode, LocationGlobalRelative, APIException
-from transformers import BertTokenizer, BertForTokenClassification
-import torch
-import re
+from re import match, sub 
 from difflib import get_close_matches
-
 
 WAYPOINTS = {
     "home": [0, 0, 3],
@@ -35,28 +23,27 @@ WAYPOINTS = {
     # Add more waypoints here
 }
 
-
-
 def recognize_speech():
     """Function to recognize speech using the microphone."""
-    with sr.Microphone() as source:
-        print("Listening...")
+    with Microphone() as source:
+        print("Listening for up to 30 seconds...")
         try:
             audio = recognizer.listen(source, timeout=2, phrase_time_limit=30)
+            print("Captured audio, processing...")
             query = recognizer.recognize_google(audio)
             return query
-        except sr.UnknownValueError:
+        except UnknownValueError:
             print("Sorry, I couldn't understand that. Please try again.")
             return None
-        except sr.RequestError as e:
+        except RequestError as e:
             print(f"Could not request results; {e}")
             return None
-        except sr.WaitTimeoutError:
+        except WaitTimeoutError:
             print("No speech detected. Please try again.")
             return None
         
 # Initialize the speech recognizer
-recognizer = sr.Recognizer()
+recognizer = Recognizer()
 
 def run_WakeWord(turnOn):
     """Function to listen for the wake word and recognize commands."""
@@ -104,7 +91,7 @@ def run_WakeWord(turnOn):
 
 
 # Connect to the drone via TCP
-connection = mavutil.mavlink_connection('tcp:127.0.0.1:5763')
+connection = mavutil.mavlink_connection("udp:127.0.0.1:14550")
 
 # Wait for a heartbeat to confirm connection
 print("Waiting for heartbeat...")
@@ -146,7 +133,7 @@ def arm_check_required(func):
             print("Drone is not armed. Arming the drone before proceeding.")
             arm_disarm(True)  # Arm the drone if not already armed
             print("Drone armed. Proceeding with function execution.")
-            time.sleep(5)  # Wait for the drone to arm before continuing
+            sleep(5)  # Wait for the drone to arm before continuing
         return func(*args, **kwargs)  # Continue executing the function
     return wrapper
 
@@ -196,7 +183,7 @@ def takeoff(altitude):
     arm_disarm(True)  # Ensure the drone is armed before takeoff
     print(f"Taking off to {altitude}m...")
     send_nav_command(mavutil.mavlink.MAV_CMD_NAV_TAKEOFF, z=altitude)
-    time.sleep(2)
+    sleep(2)
     altitude = altitude - 0.05
     wait_for_altitude(altitude, ALTITUDE_TOLERANCE)
     print("Takeoff complete.")
@@ -206,7 +193,7 @@ def land():
     """Lands the drone and waits for completion."""
     print("Landing...")
     send_nav_command(mavutil.mavlink.MAV_CMD_NAV_LAND)
-    time.sleep(2)
+    sleep(2)
     altitude = 0
     wait_for_altitude(altitude, ALTITUDE_TOLERANCE)
     print("Landing complete.")
@@ -226,13 +213,13 @@ def move(x, y, altitude):
         0, 0, 0,  # No acceleration
         0, 0
     )
-    time.sleep(5)
+    sleep(5)
 
 @arm_check_required
 def set_altitude(altitude):
     """Sets the target altitude for the drone."""
     print(f"Setting altitude to {altitude}m...")
-    time.sleep(3)
+    sleep(3)
 
 @arm_check_required
 def spin(degrees):
@@ -241,7 +228,7 @@ def spin(degrees):
     set_mode("GUIDED")
     print(f"Rotating {degrees} degrees...")
     send_nav_command(mavutil.mavlink.MAV_CMD_CONDITION_YAW, param1=degrees, param2=25, param3=1, param4=1)
-    time.sleep(time_needed)
+    sleep(time_needed)
 
 def wait_for_altitude(target_altitude, tolerance):
     """Waits until the drone reaches the target altitude within the specified tolerance."""
@@ -257,7 +244,7 @@ def wait_for_altitude(target_altitude, tolerance):
         if time.time() - start_time > 30:
             print("Timeout waiting for altitude")
             return
-        time.sleep(0.1)
+        sleep(0.1)
 
 @arm_check_required
 def fly_to(x, y):
@@ -280,7 +267,7 @@ def fly_to(x, y):
         0, 0, 0,  # No acceleration
         0, 0
     )
-    time.sleep(5)  # Allow time for movement
+    sleep(5)  # Allow time for movement
 
 @arm_check_required
 def go_up(delta_altitude):
@@ -303,7 +290,7 @@ def go_up(delta_altitude):
         0, 0, 0,  # No acceleration
         0, 0
     )
-    time.sleep(3)  # Allow time for altitude change
+    sleep(3)  # Allow time for altitude change
 
 @arm_check_required
 def go_down(delta_altitude):
@@ -326,7 +313,7 @@ def go_down(delta_altitude):
         0, 0, 0,  # No acceleration
         0, 0
     )
-    time.sleep(3)  # Allow time for altitude change
+    sleep(3)  # Allow time for altitude change
 
 # --- Command Processing ---
 
@@ -337,7 +324,7 @@ def segment_sentence(sentence):
     except for cases like 'spin', 'rotate', 'spend', etc.
     """
     # Preprocess the sentence to split multi-digit numbers into individual digits
-    sentence = re.sub(r'(\d+)', lambda x: ' '.join(list(x.group(0))), sentence)
+    sentence = sub(r'(\d+)', lambda x: ' '.join(list(x.group(0))), sentence)
     
     # Convert the sentence to lowercase and split into tokens
     tokens = sentence.lower().split()
@@ -385,7 +372,7 @@ def segment_sentence(sentence):
                 processed_tokens.append(tokens[i])
                 i += 1
                 continue
-            elif re.match(r'^[a-z]+$', tokens[i]):  # Only word tokens (like "move")
+            elif match(r'^[a-z]+$', tokens[i]):  # Only word tokens (like "move")
                 processed_tokens.append(tokens[i])
                 i += 1
                 continue
@@ -501,4 +488,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

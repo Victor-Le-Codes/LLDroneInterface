@@ -1,0 +1,7 @@
+dronekit
+matplotlib
+opencv-python
+pyaudio
+pygame
+pymavlink
+SpeechRecognition
