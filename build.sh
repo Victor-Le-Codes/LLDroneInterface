@@ -25,7 +25,8 @@ fi
 echo "🐳 Building and starting SITL Docker container..."
 docker build -t ll-sitl .
 docker rm -f sitl-sim >/dev/null 2>&1 || true
-docker run -d -p 5763:5763 --name sitl-sim ll-sitl
+# publish TCP 14550
+docker run -d -p 14550:5760 --name sitl-sim ll-sitl
 echo "⌛ Waiting for SITL to initialize..."
 sleep 10
 
@@ -67,12 +68,15 @@ pip install -r requirements.txt
 echo "📥 Installing required Python libraries..."
 pip install -r requirements.txt
 
-# Wait until the port is available
-echo "⏳ Waiting for SITL (port 5763) to become available..."
-until nc -z localhost 5763; do
-    sleep 1
+# Wait until SITL port is available
+echo "⏳ Waiting for SITL (port 14550) to become available..."
+for i in {1..30}; do
+  if nc -z localhost 14550; then
+    echo "✅ SITL is ready!"
+    break
+  fi
+  sleep 1
 done
-echo "✅ SITL is ready!"
 
 # Run the drone control script
 echo "🛫 Running drone voice controller..."

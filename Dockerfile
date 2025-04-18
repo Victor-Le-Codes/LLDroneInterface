@@ -23,10 +23,12 @@ RUN git clone https://github.com/ArduPilot/ardupilot.git && \
     Tools/environment_install/install-prereqs-ubuntu.sh -y
 
 # Expose default MAVLink ports
-EXPOSE 5760 5763
+EXPOSE 14550 14550
 
 # Set working directory
 WORKDIR /ardupilot/ArduCopter
 
 # Default command to launch SITL
-CMD ["../Tools/autotest/sim_vehicle.py", "-v", "ArduCopter", "--model", "quad", "--out=udp:host.docker.internal:14550", "--no-mavproxy"]
+RUN cd /ardupilot && ./waf configure --board sitl && ./waf copter
+
+CMD ["/ardupilot/build/sitl/bin/arducopter","--model","quad","-I0"]

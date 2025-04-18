@@ -91,7 +91,7 @@ def run_WakeWord(turnOn):
 
 
 # Connect to the drone via TCP
-connection = mavutil.mavlink_connection("udp:127.0.0.1:14550")
+connection = mavutil.mavlink_connection("tcp:127.0.0.1:14550", autoreconnect=True)
 
 # Wait for a heartbeat to confirm connection
 print("Waiting for heartbeat...")
@@ -487,4 +487,5 @@ def main():
     
 
 if __name__ == "__main__":
+    print("🎬 Starting main loop...")
     main()
