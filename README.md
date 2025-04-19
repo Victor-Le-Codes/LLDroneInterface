@@ -3,12 +3,16 @@ Large Language Interface For MAVProxy Drones
 
 Install Docker Desktop from https://docs.docker.com/desktop/
 
-Give permissions to the build shell script.
+Open Docker Desktop on your local machine. Sign in or create an account. 
 
-``chmod +x build.sh``
+On your terminal (for Windows: WSL or Git Bash; for Mac: iTerm or Terminal).
 
-Run the build script
+    // Give permissions to the build shell script.
 
-``./build.sh``
+    chmod +x build.sh
+
+    // Run the build script
+
+    ./build.sh
 
 For any bugs, submit an issue. 
