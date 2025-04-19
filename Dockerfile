@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies
+# ── Install system dependencies ───────────────────────────────────────────────────
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y \
     git python3 python3-pip python3-matplotlib \
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get upgrade -y && \
     gstreamer1.0-libav gstreamer1.0-gl screen && \
     pip3 install pexpect MAVProxy PyYAML
 
-# Clone ArduPilot
+# ── Clone ArduPilot ───────────────────────────────────────────────────
 RUN git clone https://github.com/ArduPilot/ardupilot.git && \
     cd ardupilot && \
     sed -i 's/if \[ "\$EUID" -eq 0 \ ]; then echo/#/' Tools/environment_install/install-prereqs-ubuntu.sh && \
@@ -23,7 +23,7 @@ RUN git clone https://github.com/ArduPilot/ardupilot.git && \
     Tools/environment_install/install-prereqs-ubuntu.sh -y
 
 # Expose default MAVLink ports
-EXPOSE 14550 14550
+EXPOSE 5763 5763
 
 # Set working directory
 WORKDIR /ardupilot/ArduCopter

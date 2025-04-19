@@ -25,8 +25,8 @@ fi
 echo "🐳 Building and starting SITL Docker container..."
 docker build -t ll-sitl .
 docker rm -f sitl-sim >/dev/null 2>&1 || true
-# publish TCP 14550
-docker run -d -p 14550:5760 --name sitl-sim ll-sitl
+# publish TCP 5763
+docker run -d -p 5763:5760 --name sitl-sim ll-sitl
 echo "⌛ Waiting for SITL to initialize..."
 sleep 10
 
@@ -69,7 +69,7 @@ echo "📥 Installing required Python libraries..."
 pip install -r requirements.txt
 
 # Wait until SITL port is available
-PORT=14550
+PORT=5763
 echo "⏳ Waiting for SITL (port $PORT) to become available..."
 if command -v nc &>/dev/null; then
   # Use netcat if installed

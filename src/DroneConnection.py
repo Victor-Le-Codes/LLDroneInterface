@@ -1,12 +1,13 @@
 from pymavlink import mavutil
 from time import sleep, time
+from threading import Thread
 
 # --- Global Parameters ---
 DEFAULT_ALTITUDE = 2.0  # Default altitude in meters
 ALTITUDE_TOLERANCE = 0.4  # Tolerance for altitude maintenance (10%) Tolerance set to 0.4 for testing purposes
 
 class DroneConnection:
-    def __init__(self, uri="tcp:127.0.0.1:14550"):
+    def __init__(self, uri="tcp:127.0.0.1:5763"):
         self.conn = mavutil.mavlink_connection(uri, autoreconnect=True)
         self._wait_for_heartbeat()
 
