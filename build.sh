@@ -94,4 +94,4 @@ fi
 
 # Run the drone control script
 echo "🛫 Running drone voice controller..."
-$PYTHON_CMD src/VC_test_user_controlled_drone_9.py
+$PYTHON_CMD src/main.py
