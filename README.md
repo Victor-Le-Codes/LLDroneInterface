@@ -205,7 +205,7 @@ sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 
 
 
-# Install PX4
+# Install PX4 (Not needed if using PIXHAWK6)
 
 ### Open New Ubuntu 22.04 instance
 
@@ -216,6 +216,8 @@ git clone https://github.com/PX4/Firmware.git --recursive
 ```
 
 ### If using WSL, cut everything from the "Firmware" directory and paste it under the "PX4-Autopilot" directory made earlier
+
+### Then proceed with the below
 
 ```
 ./Tools/setup/ubuntu.sh --no-sim-tools --no-nutty
