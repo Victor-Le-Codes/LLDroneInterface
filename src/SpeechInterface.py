@@ -45,12 +45,15 @@ class SpeechInterface:
                 query = self.recognizer.recognize_google(audio)
                 return query
             except UnknownValueError:
+                self.play_audio("GA_No_Voice_Detected.mp3")
                 print("Sorry, I couldn't understand that. Please try again.")
                 return None
             except RequestError as e:
+                self.play_audio("GA_No_Voice_Detected.mp3")
                 print(f"Could not request results; {e}")
                 return None
             except WaitTimeoutError:
+                self.play_audio("GA_No_Voice_Detected.mp3")
                 print("No speech detected. Please try again.")
         return None
 
