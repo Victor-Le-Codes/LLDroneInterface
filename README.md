@@ -209,29 +209,29 @@ sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 
 ### Open New Ubuntu 22.04 instance
 
-'''
+```
 cd
 mkdir PX4-Autopilot && cd PX4-Autopilot
 git clone https://github.com/PX4/Firmware.git --recursive
-'''
+```
 
 ### If using WSL, cut everything from the "Firmware" directory and paste it under the "PX4-Autopilot" directory made earlier
 
-'''
+```
 ./Tools/setup/ubuntu.sh --no-sim-tools --no-nutty
 make px4_sitl gz_x500
-'''
+```
 
 ### Install pytorch
 
-'''
+```
 pip3 install torch torchvision torchaudio
-'''
+```
 
 
 ## To Rerun the simulation
 
-'''
+```
 cd PX4-Autopilot
 make px4_sitl gz_x500
-'''
+```
