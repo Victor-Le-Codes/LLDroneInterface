@@ -1,5 +1,5 @@
 # LLDroneInterface
-Large Language Interface For MAVProxy Drones
+Large Language Interface For MAVProxy Drones using either the MAVUTIL library (like the Pixhawk 6 series) or the MAVSDK library (like the ModalAI Seeker).
 
 Confirmed working for Windows 11; Unconfirmed for Windows 10
 
