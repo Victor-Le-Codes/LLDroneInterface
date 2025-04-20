@@ -3,77 +3,84 @@ from difflib import get_close_matches
 from re import match, sub 
 
 class CommandParser:
+    IRRELEVANT_WORDS = {"to", "by", "and", "in", "on", "at", "for", ",", ".", "space", "go", "the", "find"}
+
     def __init__(self, waypoints: dict[str,list[float]]):
         self.waypoints = waypoints
 
-    def parse(self, text: str) -> list[str]:      # segment_sentence
+    def segment_sentence(self, sentence: str) -> list[str]:
         """
         Segments the sentence into drone actions based on recognized patterns.
         Filters out non-relevant words (like 'to', 'by', 'and', etc.) and splits multi-digit numbers,
         except for cases like 'spin', 'rotate', 'spend', etc.
         """
         # Preprocess the sentence to split multi-digit numbers into individual digits
-        sentence = sub(r'(\d+)', lambda x: ' '.join(list(x.group(0))), text)
-        
+        sentence = sub(r'(\d+)', lambda x: ' '.join(list(x.group(0))), sentence)
         # Convert the sentence to lowercase and split into tokens
         tokens = sentence.lower().split()
-        
         processed_tokens = []
         i = 0
-        
         while i < len(tokens):
+            token = tokens[i]
             # Skip irrelevant words (e.g., 'to', 'by', 'and', etc.)
-            if tokens[i] in ["to", "by", "and", "in", "on", "at", "for", ",", ".", "space", "go", "the", "find"]:
+            if token in self.IRRELEVANT_WORDS:
                 i += 1
                 continue
-            
-            if i < len(tokens) - 1:
-                if tokens[i] == "take" and tokens[i+1] == "off":
-                    processed_tokens.append("take_off")
+
+            # Two-word commands
+            if i + 1 < len(tokens):
+                two = f"{token} {tokens[i+1]}"
+                if two in {"take off", "filing cabinet", "water dispenser", "coffee machine"}:
+                    processed_tokens.append(two.replace(" ", "_"))
                     i += 2
                     continue
-                elif tokens[i] == "filing" and tokens[i+1] == "cabinet":
-                    processed_tokens.append("filing_cabinet")
+                elif token in {"spin", "rotate", "spend"}:
+                    processed_tokens.append(token)
                     i += 2
                     continue
-                elif tokens[i] == "water" and tokens[i+1] == "dispenser":
-                    processed_tokens.append("water_dispenser")
-                    i += 2
-                    continue
-                elif tokens[i] == "coffee" and tokens[i+1] == "machine":
-                    processed_tokens.append("coffee_machine")
-                    i += 2
-                    continue
-                elif tokens[i] in ["spin", "rotate", "spend"]:
-                    # Don't split numbers after 'spin', 'rotate', 'spend'
-                    processed_tokens.append(tokens[i])
-                    i += 2  # Skip the number part
-                    continue
-                elif tokens[i] in ["move", "fly"]:  # Handle commands like move, fly
-                    processed_tokens.append("move")  # Treat both 'move' and 'fly' as 'move'
-                    i += 1  # Move to the next token
-                    # If the next token is a number, treat it as a whole
-                    if i < len(tokens) and tokens[i].isdigit():
+                elif token in {"move", "fly"}:
+                    processed_tokens.append("move")
+                    i += 1
+                    if i < len(tokens) and match(r'^-?\d+$', tokens[i]):
                         processed_tokens.append(tokens[i])
-                        i += 1  # Skip the number part
+                        i += 1
                     continue
-                elif tokens[i].isdigit():  # Handle other numbers as they are
-                    processed_tokens.append(tokens[i])
+                elif token.isdigit():  # Handle other numbers as they are
+                    processed_tokens.append(token)
                     i += 1
                     continue
-                elif match(r'^[a-z]+$', tokens[i]):  # Only word tokens (like "move")
-                    processed_tokens.append(tokens[i])
+                elif match(r'^[a-z]+$', token):  # Only word tokens (like "move")
+                    processed_tokens.append(token)
                     i += 1
                     continue
-            
+
+            pos_num_map = {
+                "zero":"0","one":"1","two":"2","three":"3","four":"4","five":"5",
+                "six":"6","seven":"7","eight":"8","nine":"9","ten":"10","eleven":"11",
+                "twelve":"12","thirteen":"13","fourteen":"14","fifteen":"15",
+                "sixteen":"16","seventeen":"17","eighteen":"18","nineteen":"19","twenty":"20"
+            }
+            if token == "negative" and i + 1 < len(tokens):
+                next_token = tokens[i+1]
+                if next_token in pos_num_map:
+                    processed_tokens.append(f"-{pos_num_map[next_token]}")
+                    i += 2
+            elif token in pos_num_map:
+                processed_tokens.append(pos_num_map[token])
+                i += 1
+            elif match(r'^-?\d+$', token):
+                processed_tokens.append(token)
+                i += 1
+            elif match(r'^[a-z]+$', token):
+                processed_tokens.append(token)
+                i += 1
             # Default to just appending the token if it's not caught by any condition
             else:
-                processed_tokens.append(tokens[i])
+                processed_tokens.append(token)
                 i += 1
-        
         return processed_tokens
 
-    def execute(self, commands: list[str], drone: DroneConnection):   # VC_translator
+    def VC_translator(self, commands: list[str], drone: DroneConnection):
         """Translates a list of segmented commands into drone control function calls."""
         if not commands:
             print("No command received.")
@@ -156,3 +163,4 @@ class CommandParser:
                 break
 
             i += 1
+            

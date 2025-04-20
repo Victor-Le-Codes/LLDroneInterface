@@ -1,6 +1,5 @@
 from pymavlink import mavutil
 from time import sleep, time
-from threading import Thread
 
 # --- Global Parameters ---
 DEFAULT_ALTITUDE = 2.0  # Default altitude in meters

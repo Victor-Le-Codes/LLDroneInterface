@@ -19,25 +19,18 @@ WAYPOINTS = {
 }
 
 class VoiceDroneController:
+
     def __init__(self):
         self.drone = DroneConnection()
         self.speech = SpeechInterface()
         self.parser = CommandParser(WAYPOINTS)
 
-    def run(self):
-        print("Ready for voice commands. Please speak clearly.")
-        while True:
-            wake = self.speech.listen_for_wake()
-            if wake is None: 
-                continue
-            while True:
-                cmd = self.speech.listen_for_command()
-                print(f"You said: {cmd}")
-                if not cmd:
-                    continue
-                if cmd.lower() in ("goodbye","bye"):
-                    self.drone.disarm()
-                    return
-                tokens = self.parser.parse(cmd)
-                if tokens:
-                    self.parser.execute(tokens, self.drone)
+    def listen_loop(self, require_wake: bool = True) -> None:
+        """Continuously listen and execute until 'goodbye'."""
+        running = True
+        while running:
+            running, tokens = self.speech.listen_for_commands(require_wake)
+            if not running:
+                break
+            self.speech.play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
+            running = self.parser.VC_translator(tokens, self.drone)
