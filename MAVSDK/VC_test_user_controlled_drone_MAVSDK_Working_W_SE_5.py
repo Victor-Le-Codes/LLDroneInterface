@@ -94,6 +94,7 @@ WAYPOINTS = {
     "d": [0.2, -0.2, 0.5]
 
     # Add more waypoints here
+    # Waypoints A, B, C, and D are for testing purposes
 }
 
 
@@ -143,10 +144,14 @@ def run_WakeWord(turnOn):
        
         while not wake_word_detected:
             wake_prompt = recognize_speech()
-            if wake_prompt and ("ok steven" or "ok stephen" or "hey steven" or "hey stephen") in wake_prompt.lower():
+
+            if wake_prompt == None:
+                continue
+
+            elif wake_prompt and ("ok steven") or ("hey steven") in wake_prompt.lower():
                 wake_word_detected = True
-                play_audio("GA_Mic_Start.mp3")
                 print("Wake word 'Steven' detected! Listening for your command...")
+                play_audio("../Audio/GA_Mic_Start.mp3")
                 
             elif wake_prompt:
                 print(f"You said: {wake_prompt}. Waiting for the wake word 'Steven'.")
@@ -159,7 +164,7 @@ def run_WakeWord(turnOn):
         # Print the recognized command
         print(f"You said: {command}")
 
-        play_audio("GA_Voice_Command_Recognized.mp3")
+        play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
 
         def normalize_goodbye(user_input):
             normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
@@ -192,9 +197,13 @@ def run_OneVCOnly(turnOn):
         wake_word_detected = True
        
         while not wake_word_detected:
-            play_audio("GA_Mic_Start.mp3")
+            play_audio("../Audio/GA_Mic_Start.mp3")
             wake_prompt = recognize_speech()
-            if wake_prompt and ("ok steven" or "ok stephen" or "hey steven" or "hey stephen") in wake_prompt.lower():
+
+            if wake_prompt == None:
+                continue
+
+            elif wake_prompt and ("steven") or ("hey steven") in wake_prompt.lower():
                 wake_word_detected = True
                 print("Wake word 'Steven' detected! Listening for your command...")
             elif wake_prompt:
@@ -208,7 +217,7 @@ def run_OneVCOnly(turnOn):
         # Print the recognized command
         print(f"You said: {command}")
 
-        play_audio("GA_Voice_Command_Recognized.mp3")
+        play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
 
         def normalize_goodbye(user_input):
             normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
@@ -237,19 +246,20 @@ def recognize_speech():
     with sr.Microphone() as source:
         print("Listening...")
         try:
-            audio = recognizer.listen(source, timeout=2, phrase_time_limit=30)
+            audio = recognizer.listen(source, timeout=3, phrase_time_limit=30)
+            print("Captured audio, processing...")
             query = recognizer.recognize_google(audio)
             return query
         except sr.UnknownValueError:
-            play_audio("GA_No_Voice_Detected.mp3")
+            play_audio("../Audio/GA_No_Voice_Detected.mp3")
             print("Sorry, I couldn't understand that. Please try again.")
             return None
         except sr.RequestError as e:
-            play_audio("GA_No_Voice_Detected.mp3")
+            play_audio("../Audio/GA_No_Voice_Detected.mp3")
             print(f"Could not request results; {e}")
             return None
         except sr.WaitTimeoutError:
-            play_audio("GA_No_Voice_Detected.mp3")
+            play_audio("../Audio/GA_No_Voice_Detected.mp3")
             print("No speech detected. Please try again.")
             return None
         
@@ -276,6 +286,8 @@ def segment_sentence(sentence):
         if tokens[i] in ["to", "by", "and", "in", "on", "at", "for", ",", ".", "space", "go", "the", "find"]:
             i += 1
             continue
+
+        # Processes potential two-worded tokens and other alternative words
         
         if tokens[i] == "take" and tokens[i+1] == "off":
             processed_tokens.append("takeoff")
@@ -1193,8 +1205,9 @@ async def main():
             print("C. Voice Command (Run Continuously)\n")
             print("T. Text-Based Command\n")
             print("F. Functions List\n")
+            print("W. Waypoint List\n")
             print("E. Exit\n")
-            coms = input("Please input V, C, T, or E:")
+            coms = input("Please input V, C, T, F, W, or E:")
 
             print()
 
@@ -1235,13 +1248,20 @@ async def main():
                 print("Takeoff: Drone becomes airborne\n")
                 print("Move X Y Z: Drone moves in an x and y coordinate plane with Z being altitude \n")
                 print("Waypoint: Drone moves to preset waypoints. Press 'W' to see the list of current waypoints\n")
+                print("Land: Drone lands at its current XY position\n")
+                print("Home: Drone goes to its default XY position of 0, 0 with an altitude of", drone.DEFAULT_ALTITUDE, "\n")
+                print()
+
+            elif coms.lower() == "w":
+
+                print(WAYPOINTS)
                 print()
 
             elif coms.lower() == "e":
 
                 print("Goodbye!")
                 print()
-                break
+                sys.exit()
 
             else:
                 print("Invalid command. Please try again.\n")
