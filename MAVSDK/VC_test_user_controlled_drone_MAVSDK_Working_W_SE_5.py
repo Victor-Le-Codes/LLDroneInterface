@@ -20,6 +20,8 @@ import sys
 import subprocess
 import contextlib
 
+from pathlib import Path
+
 @contextlib.contextmanager
 def suppress_stderr():
     with open(os.devnull, 'w') as fnull:
@@ -102,9 +104,11 @@ WAYPOINTS = {
 pygame.mixer.init()
 
 # pygame added for sound effects:
+AUDIO_DIR = Path(__file__).resolve().parents[1] / "Audio"
 
-def play_audio(file_path):
+def play_audio(filename):
     """Function to play an audio file using pygame."""
+    file_path = AUDIO_DIR / filename
     try:
         # Stop any previous audio playback
         if pygame.mixer.music.get_busy():
@@ -151,7 +155,7 @@ def run_WakeWord(turnOn):
             elif wake_prompt and ("ok steven") or ("hey steven") in wake_prompt.lower():
                 wake_word_detected = True
                 print("Wake word 'Steven' detected! Listening for your command...")
-                play_audio("../Audio/GA_Mic_Start.mp3")
+                play_audio("GA_Mic_Start.mp3")
                 
             elif wake_prompt:
                 print(f"You said: {wake_prompt}. Waiting for the wake word 'Steven'.")
@@ -164,7 +168,7 @@ def run_WakeWord(turnOn):
         # Print the recognized command
         print(f"You said: {command}")
 
-        play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
+        play_audio("GA_Voice_Command_Recognized.mp3")
 
         def normalize_goodbye(user_input):
             normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
@@ -197,7 +201,7 @@ def run_OneVCOnly(turnOn):
         wake_word_detected = True
        
         while not wake_word_detected:
-            play_audio("../Audio/GA_Mic_Start.mp3")
+            play_audio("GA_Mic_Start.mp3")
             wake_prompt = recognize_speech()
 
             if wake_prompt == None:
@@ -217,7 +221,7 @@ def run_OneVCOnly(turnOn):
         # Print the recognized command
         print(f"You said: {command}")
 
-        play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
+        play_audio("GA_Voice_Command_Recognized.mp3")
 
         def normalize_goodbye(user_input):
             normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
@@ -251,15 +255,15 @@ def recognize_speech():
             query = recognizer.recognize_google(audio)
             return query
         except sr.UnknownValueError:
-            play_audio("../Audio/GA_No_Voice_Detected.mp3")
+            play_audio("GA_No_Voice_Detected.mp3")
             print("Sorry, I couldn't understand that. Please try again.")
             return None
         except sr.RequestError as e:
-            play_audio("../Audio/GA_No_Voice_Detected.mp3")
+            play_audio("GA_No_Voice_Detected.mp3")
             print(f"Could not request results; {e}")
             return None
         except sr.WaitTimeoutError:
-            play_audio("../Audio/GA_No_Voice_Detected.mp3")
+            play_audio("GA_No_Voice_Detected.mp3")
             print("No speech detected. Please try again.")
             return None
         

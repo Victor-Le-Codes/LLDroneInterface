@@ -10,6 +10,7 @@ from difflib import get_close_matches
 import pygame
 import re
 import sys
+from pathlib import Path
 
 WAYPOINTS = {
     "home": [0, 0, 3],
@@ -33,9 +34,11 @@ WAYPOINTS = {
 pygame.mixer.init()
 
 # pygame added for sound effects:
+AUDIO_DIR = Path(__file__).resolve().parents[1] / "Audio"
 
-def play_audio(file_path):
+def play_audio(filename):
     """Function to play an audio file using pygame."""
+    file_path = AUDIO_DIR / filename
     try:
         # Stop any previous audio playback
         if pygame.mixer.music.get_busy():
@@ -100,7 +103,7 @@ def run_WakeWord(turnOn):
             elif wake_prompt and ("okay steven") or ("hey steven") in wake_prompt.lower():
                 wake_word_detected = True
                 print("Wake word 'Steven' detected! Listening for your command...")
-                play_audio("../Audio/GA_Mic_Start.mp3")
+                play_audio("GA_Mic_Start.mp3")
             elif wake_prompt:
                 print(f"You said: {wake_prompt}. Waiting for the wake word 'Steven'.")
             else:
@@ -113,7 +116,7 @@ def run_WakeWord(turnOn):
 
         # Print the recognized command
         print(f"You said: {command}")
-        play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
+        play_audio("GA_Voice_Command_Recognized.mp3")
 
         def normalize_goodbye(user_input):
             normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
@@ -154,7 +157,7 @@ def run_OneVCOnly(turnOn):
 
             elif wake_prompt and ("steven") or ("hey steven") in wake_prompt.lower():
                 wake_word_detected = True
-                play_audio("../Audio/GA_Mic_Start.mp3")
+                play_audio("GA_Mic_Start.mp3")
                 print("Listening for your command...")
             elif wake_prompt:
                 print(f"You said: {wake_prompt}. Waiting for the wake word 'Steven'.")
@@ -167,7 +170,7 @@ def run_OneVCOnly(turnOn):
         # Print the recognized command
         print(f"You said: {command}")
 
-        play_audio("../Audio/GA_Voice_Command_Recognized.mp3")
+        play_audio("GA_Voice_Command_Recognized.mp3")
 
         def normalize_goodbye(user_input):
             normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
