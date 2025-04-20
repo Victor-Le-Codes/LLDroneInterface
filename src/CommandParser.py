@@ -93,32 +93,6 @@ class CommandParser:
             # Takeoff Command
             if command == "take_off":
                 drone.takeoff(DEFAULT_ALTITUDE)
-            
-            # # Fly To Command (X, Y coordinates)
-            # elif command == "fly_to" and i + 2 < len(command_list):
-            #     try:
-            #         x, y = float(command_list[i + 1]), float(command_list[i + 2])
-            #         fly_to(x, y)
-            #         i += 2
-            #     except ValueError:
-            #         print(f"Invalid coordinates for fly_to: {command_list[i+1:i+3]}")
-
-            # # Go Up Command
-            # elif command == "go_up" and i + 1 < len(command_list):
-            #     try:
-            #         go_up(float(command_list[i + 1]))
-            #         i += 1
-            #     except ValueError:
-            #         print(f"Invalid altitude for go_up: {command_list[i+1]}")
-
-            # # Go Down Command
-            # elif command == "go_down" and i + 1 < len(command_list):
-            #     try:
-            #         go_down(float(command_list[i + 1]))
-            #         i += 1
-            #     except ValueError:
-            #         print(f"Invalid altitude for go_down: {command_list[i+1]}")
-
             # Spin Command (degrees)
             elif command == "spin" and i + 1 < len(commands):
                 try:
@@ -126,7 +100,6 @@ class CommandParser:
                     i += 1
                 except ValueError:
                     print(f"Invalid angle for spin: {commands[i+1]}")
-
             # Move Command (X, Y, Z altitude)
             elif command == "move" and i + 3 < len(commands):
                 try:
@@ -135,11 +108,10 @@ class CommandParser:
                     i += 3
                 except ValueError:
                     print(f"Invalid move parameters: {commands[i+1:i+4]}")
-
             # Home Command (Return to home position)
             elif command == "home":
                 drone.move(0, 0, DEFAULT_ALTITUDE)
-
+            # Waypoint Command
             elif command == "waypoint" and i + 1 < len(commands):
                 wp_name = commands[i + 1].lower()
                 match = get_close_matches(wp_name, self.waypoints.keys(), n=1, cutoff=0.6)
@@ -150,11 +122,9 @@ class CommandParser:
                 else:
                     print(f"Unknown waypoint: {wp_name}")
                     i += 1
-
             # Land Command
             elif command == "land":
                 drone.land()
-            
             # Exit Command
             elif command == "exit":
                 drone.land()

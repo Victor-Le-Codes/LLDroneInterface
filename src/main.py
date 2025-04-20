@@ -4,6 +4,7 @@ from time import sleep
 def main():
     ctrl = VoiceDroneController()
     while True:
+        """Displays the main menu for users"""
         print("Please select a command :\n")
         print("V. Voice Command (One Instance)\n")
         print("C. Voice Command (Run Continuously)\n")
