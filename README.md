@@ -205,7 +205,7 @@ sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 
 
 
-### Install PX4
+# Install PX4
 
 ### Open New Ubuntu 22.04 instance
 
