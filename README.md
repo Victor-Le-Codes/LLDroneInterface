@@ -204,84 +204,10 @@ sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 ```
 
 
-# OG COMMANDS FROM RICHIE/RYU IF YOU GET STUCK
 
-```
-mkdir -p gz_ws/src
+### Install PX4
 
-cd gz_ws/src/
-
-git clone https://github.com/ArduPilot/ardupilot_gazebo
-
-cd ardupilot_gazebo/
-
-mkdir build && cd build
-
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-
-make -j4
-
-cd
-
-source .bashrc
-
-cd gz_ws/
-
-ls
-```
-
-confirm ls output is src
-
-```
-export GZ_SIM_SYSTEM_PLUGIN_PATH=$HOME/gz_ws/src/ardupilot_gazebo/build:$GZ_SIM_SYSTEM_PLUGIN_PATH
-export GZ_SIM_RESOURCE_PATH=$HOME/gz_ws/src/ardupilot_gazebo/models:$HOME/gz_ws/src/ardupilot_gazebo/worlds:$GZ_SIM_RESOURCE_PATH
-
-echo 'export GZ_SIM_SYSTEM_PLUGIN_PATH=$HOME/gz_ws/src/ardupilot_gazebo/build:${GZ_SIM_SYSTEM_PLUGIN_PATH}' >> ~/.bashrc
-echo 'export GZ_SIM_RESOURCE_PATH=$HOME/gz_ws/src/ardupilot_gazebo/models:$HOME/gz_ws/src/ardupilot_gazebo/worlds:${GZ_SIM_RESOURCE_PATH}' >> ~/.bashrc
-
-export PATH=$PATH:$HOME/ardupilot/Tools/autotest
-
-gz sim -v4 -r iris_runway.sdf
-```
-
-New Terminal for below: 
-
-```
-cd
-
-source .bashrc
-
-sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
-
-../Tools/autotest/sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
-
-
-cd ~/ardupilot/Tools/autotest
-sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
-
-sudo hwclock -s 
-```
-
-OR
-
-```
-sudo timedatectl set-ntp true
-
-gz sim -v4 -r iris_runway.sdf
-```
-
-New Terminal for below: 
-
-```
-sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
-```
-
-
-
-
-Install PX4
-
-Open New Ubuntu 22.04 instance
+### Open New Ubuntu 22.04 instance
 
 '''
 cd
@@ -289,23 +215,21 @@ mkdir PX4-Autopilot && cd PX4-Autopilot
 git clone https://github.com/PX4/Firmware.git --recursive
 '''
 
-## If using WSL, cut everything from the "Firmware" directory and paste it under the "PX4-Autopilot" directory made earlier
+### If using WSL, cut everything from the "Firmware" directory and paste it under the "PX4-Autopilot" directory made earlier
 
 '''
 ./Tools/setup/ubuntu.sh --no-sim-tools --no-nutty
 make px4_sitl gz_x500
 '''
 
-Install pytorch
+### Install pytorch
 
 '''
 pip3 install torch torchvision torchaudio
 '''
 
 
-### Run the program
-
-## Run the simulation
+## To Rerun the simulation
 
 '''
 cd PX4-Autopilot
