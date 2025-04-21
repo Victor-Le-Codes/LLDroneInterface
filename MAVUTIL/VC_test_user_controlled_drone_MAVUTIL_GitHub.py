@@ -447,6 +447,10 @@ def segment_sentence(sentence):
                 processed_tokens.append("take_off")
                 i += 2
                 continue
+            elif tokens[i] == "takeoff":
+                processed_tokens.append("take_off")
+                i += 1
+                continue
             elif tokens[i] == "filing" and tokens[i+1] == "cabinet":
                 processed_tokens.append("filing_cabinet")
                 i += 2
