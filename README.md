@@ -4,17 +4,9 @@ Large Language Interface For MAVProxy Drones using either the MAVUTIL library (l
 Confirmed working for Windows 11; Unconfirmed for Windows 10
 
 Contributors:
-Victor Le (Team Lead)
-Angel Gomez
-Hieu Le
-Nicolas Upshaw
+Victor Le (Team Lead) | Angel Gomez | Hieu Le | Nicolas Upshaw
 
-Special Thanks to: 
-Professor Bin Hu
-Richie Ryu Suganda
-Enlai Yii
-Sal V So
-University of Houston NAIL Lab
+Special Thanks to: Professor Bin Hu | Richie Ryu Suganda | Enlai Yii | Sal V So | University of Houston NAIL Lab
 
 
 
