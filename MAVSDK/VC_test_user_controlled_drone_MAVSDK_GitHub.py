@@ -819,7 +819,7 @@ class DroneController:
         await self.drone.action.land()
         await self.wait_for_altitude(0)
         print("Landing complete")
-        await self.arm_disarm(False)
+        # await self.arm_disarm(False)
     
     async def calculate_target_yaw(self, current_pos, target_pos):
         """Calculate yaw angle (in degrees) to face the target position"""
