@@ -65,8 +65,11 @@ pip3 install accelerate aiohappyeyeballs aiohttp aiosignal annotated-types anyio
 
 
 
-# Install SITL
 
+
+# How to install Pixhawk 6 Series Adrupilot Gazebo Simulator
+
+## Install SITL
 
 ### 1. Install Windows Subsystem for Linux(WSL)
 
@@ -118,14 +121,14 @@ Tools/environment_install/install-prereqs-ubuntu.sh -y
 . ~/.profile
 ```
 
-Test SITL via below:
+### Test SITL via below:
 
 ```
 cd ~/ardupilot/Tools/autotest
 python3 sim_vehicle.py -v ArduCopter --console --map
 ```
 
-Close and open a new terminal
+### Close and open a new terminal before continuing
 
 
 ### 5. Install OSRF Packages
@@ -146,7 +149,7 @@ sudo apt install libopencv-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-
 ```
 
 
-### 7. Make a workspace folder and close repository
+### 7. Make a workspace folder and get clone the repository
 
 ```
 mkdir -p gz_ws/src && cd gz_ws/src
@@ -173,20 +176,31 @@ export GZ_SIM_RESOURCE_PATH=$HOME/gz_ws/src/ardupilot_gazebo/models:$HOME/gz_ws/
 echo 'export GZ_SIM_SYSTEM_PLUGIN_PATH=$HOME/gz_ws/src/ardupilot_gazebo/build:${GZ_SIM_SYSTEM_PLUGIN_PATH}' >> ~/.bashrc
 echo 'export GZ_SIM_RESOURCE_PATH=$HOME/gz_ws/src/ardupilot_gazebo/models:$HOME/gz_ws/src/ardupilot_gazebo/worlds:${GZ_SIM_RESOURCE_PATH}' >> ~/.bashrc
 
+```
+
+### 9. Start running Gazebo Sim 
+
+```
 gz sim -v4 -r iris_runway.sdf
 ```
 
 Open a new terminal
 
+If new terminal is using PowerShell, type in "wsl"
+
 ```
 wsl
 ```
 
-Then
+Then copy and paste the sim_vehicle.py line into that new terminal
+
+If new terminal is Ubuntu 22.04, just copy and paste below:
 
 ```
 sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 ```
+
+
 
 
 To resume drone simulation, open either WSL or Ubuntu 22.04.5
@@ -205,7 +219,11 @@ sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 
 
 
-# Install PX4 (Not needed if using PIXHAWK6)
+
+
+
+
+# Install PX4 Gazebo Simulator (Not needed if using PIXHAWK6)
 
 ### Open New Ubuntu 22.04 instance
 
@@ -215,9 +233,39 @@ mkdir PX4-Autopilot && cd PX4-Autopilot
 git clone https://github.com/PX4/Firmware.git --recursive
 ```
 
-### If using WSL, cut everything from the "Firmware" directory and paste it under the "PX4-Autopilot" directory made earlier
 
-### Then proceed with the below
+
+### You may need to cut everything from the "Firmware" directory and paste it under the "PX4-Autopilot" directory you created earlier.
+
+### If using Windows 11 and Ubuntu 22.04 via WSL, under the Windows file explorer:
+
+1. Navigate to the Linux panel, which is located towards the bottom of the Navigation Panel
+
+2. Click "Ubuntu-22.04"
+
+3. Go to home >> *user_folder* >> PX4-Autopilot >> Firmware
+
+4. Cut everything from the Firmware Directory and paste it into the PX4-Autopilot you made previously
+
+5. Proceed below to build the PX4 Gazebo Simulator
+
+
+
+
+### If you are using Ubuntu 22.04 running natively on the computer, using the Files app:
+
+1. Go to home >> PX4-Autopilot >> Firmware
+
+2. Cut everything from the Firmware Directory and paste it into the PX4-Autopilot you made previously
+
+3. Proceed below to build the PX4 Gazebo Simulator
+
+
+
+
+
+
+### Then proceed with the below to make the PX4 Gazebo simulator
 
 ```
 ./Tools/setup/ubuntu.sh --no-sim-tools --no-nutty
@@ -231,7 +279,7 @@ pip3 install torch torchvision torchaudio
 ```
 
 
-## To Rerun the simulation
+## To Rerun the simulation, simply just copy and paste the two lines below in an Ubuntu Terminal
 
 ```
 cd PX4-Autopilot
