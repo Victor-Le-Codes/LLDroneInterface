@@ -1212,7 +1212,7 @@ async def main():
             print("F. Functions List\n")
             print("W. Waypoint List\n")
             print("E. Exit\n")
-            coms = input("Please input V, C, T, F, W, or E:")
+            coms = input("Please input V, C, T, F, or W:")
 
             print()
 
@@ -1262,11 +1262,11 @@ async def main():
                 print(WAYPOINTS)
                 print()
 
-            elif coms.lower() == "e":
+            # elif coms.lower() == "e":
 
-                print("Goodbye!")
-                print()
-                sys.exit()
+            #     print("Goodbye!")
+            #     print()
+            #     sys.exit()
 
             else:
                 print("Invalid command. Please try again.\n")
