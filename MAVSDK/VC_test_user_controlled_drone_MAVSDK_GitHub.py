@@ -278,7 +278,7 @@ def segment_sentence(sentence):
     except for cases like 'spin', 'rotate', 'spend', etc.
     """
     # Preprocess the sentence to split multi-digit numbers into individual digits
-    sentence = re.sub(r'(\d+)', lambda x: ' '.join(list(x.group(0))), sentence)
+    # sentence = re.sub(r'(\d+)', lambda x: ' '.join(list(x.group(0))), sentence)
     
     # Convert the sentence to lowercase and split into tokens
     tokens = sentence.lower().split()
