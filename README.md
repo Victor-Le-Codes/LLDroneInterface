@@ -305,3 +305,13 @@ pip3 install torch torchvision torchaudio
 cd PX4-Autopilot
 make px4_sitl gz_x500
 ```
+
+
+### Having issues installing PyAudio?
+# Copy and paste the below line into an Ubuntu terminal
+
+```
+sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+sudo apt-get install ffmpeg libav-tools
+sudo pip install pyaudio
+```
