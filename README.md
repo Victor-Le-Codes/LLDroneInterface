@@ -315,3 +315,12 @@ sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp
 sudo apt-get install ffmpeg libav-tools
 sudo pip install pyaudio
 ```
+
+### Having issues with Transformers?
+
+# Copy and paste this into VS Code:
+
+```
+pip install numpy==1.23.5
+pip install --upgrade transformers
+```
