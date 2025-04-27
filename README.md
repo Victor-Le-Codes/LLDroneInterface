@@ -233,9 +233,23 @@ sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map --console
 
 ### Open New Ubuntu 22.04 instance
 
+
+Copy and paste this command into Ubuntu Terminal:
+
 ```
 cd
-mkdir PX4-Autopilot && cd PX4-Autopilot
+git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+
+```
+
+
+
+
+Then copy and paste this command into Ubuntu Terminal:
+
+```
+cd
+cd PX4-Autopilot
 git clone https://github.com/PX4/Firmware.git --recursive
 ```
 
