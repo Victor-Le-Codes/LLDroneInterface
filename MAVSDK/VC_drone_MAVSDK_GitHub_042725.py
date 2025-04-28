@@ -1259,17 +1259,17 @@ async def main():
             print("W. Waypoint List\n")
             print("Test. Test String\n")
             # print("E. Exit\n")
-            coms = input("Please enter a corresponding letter or Test:")
+            i_coms = input("Please enter a corresponding letter or Test:")
 
             print()
 
-            if coms.lower() == "l":
+            if i_coms.lower() == "l":
 
                 await drone.land()
 
                 continue
 
-            elif coms.lower() == "s":
+            elif i_coms.lower() == "s":
 
                 sc_exit = False
 
@@ -1411,7 +1411,7 @@ async def main():
                         
 
 
-            elif coms.lower() == "v":
+            elif i_coms.lower() == "v":
     
                 running = True
                 while running:
@@ -1423,7 +1423,7 @@ async def main():
 
                 continue
 
-            elif coms.lower() == "c":
+            elif i_coms.lower() == "c":
 
                 running = True
                 while running:
@@ -1432,7 +1432,7 @@ async def main():
                         break  # Exit the loop completely when 'goodbye' is detected
                     await DroneController.VC_translator(drone, running)
 
-            elif coms.lower() == "t":
+            elif i_coms.lower() == "t":
 
                 command = input("Please put in a text command: ")
 
@@ -1444,7 +1444,7 @@ async def main():
 
                 continue
 
-            elif coms.lower() == "test":
+            elif i_coms.lower() == "test":
 
                 command = test_command
 
@@ -1457,7 +1457,7 @@ async def main():
                 continue
 
 
-            elif coms.lower() == "f":
+            elif i_coms.lower() == "f":
 
                 print("Takeoff: Drone becomes airborne\n")
                 print("Move X Y Z: Drone moves in an x and y coordinate plane with Z being altitude \n")
@@ -1467,6 +1467,17 @@ async def main():
                 print("Home: Drone goes to its default XY position of 0, 0 with an altitude of", drone.DEFAULT_ALTITUDE, "\n")
                 print("Test: Test commands =", test_command, "\n")
                 print()
+
+            elif i_coms.lower() == "w":
+
+                print()
+                print("Waypoints List: \n")
+                for keys in static_WAYPOINTS.keys():
+
+                    print(keys)
+                    
+                print()
+
 
 
                 
