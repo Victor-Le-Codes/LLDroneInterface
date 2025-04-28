@@ -87,7 +87,7 @@ class DroneController:
         # Connection parameters
         self.drone = System()
         self.connection_string = connection_string
-        self.DEFAULT_ALTITUDE = 2.0
+        self.DEFAULT_ALTITUDE = 1.0
         self.ALTITUDE_TOLERANCE = 0.1
         self.last_position = None
         self.last_global_position = None
@@ -314,7 +314,7 @@ class DroneController:
                 command = cmd_dict["command"].lower()
                 print("Executing :", cmd_dict)
                 
-                if command == "takeoff":
+                if command == "takeoff" or command == "take off":
                     altitude = cmd_dict["x"]
                     await self.takeoff(altitude)
                     
@@ -890,7 +890,7 @@ def run_WakeWord(turnOn):
        
         # Once the wake word is detected, listen for a command
         coms = recognize_speech()
-        if command is None:
+        if coms is None:
             continue  # Retry if no valid speech input was detected
 
         # Print the recognized command
@@ -898,20 +898,20 @@ def run_WakeWord(turnOn):
 
         play_audio("GA_Voice_Command_Recognized.mp3")
 
-        def normalize_goodbye(user_input):
-            normalized = user_input.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
-            return "goodbye" if normalized in ["goodbye", "bye"] else user_input
+        def normalize_goodbye(uin):
+            normalized = uin.lower().replace(" ", "")  # Converts "Good bye" -> "goodbye"
+            return "goodbye" if normalized in ["goodbye", "bye"] else uin
 
-        command = normalize_goodbye(command)
+        coms = normalize_goodbye(coms)
 
         # Check for exit condition
-        if command.lower() == "goodbye":
+        if coms.lower() == "goodbye":
             print("Goodbye! Exiting the program.")
             running = False  # Set the running flag to False to exit the loop
             break
 
         else:
-            return command.lower()
+            return coms.lower()
 
     return running  # Return the status of the running flag
 
@@ -1257,6 +1257,7 @@ async def main():
             print("C. Voice Command (Run Continuously)")
             print("T. Text-Based Command")
             print("F. Functions List")
+            print("W. Waypoint List")
             print("Test. Test String")
             # print("E. Exit\n")
             i_coms = input("Please enter a corresponding letter or Test:")
@@ -1426,10 +1427,10 @@ async def main():
                     if not running:
                         break  # Exit the loop completely when 'goodbye' is detected
                 
-                coms = running
-                waypoints = await parseLLM(coms, drone)
-                print(waypoints)
-                await drone.VC_translator(waypoints)
+                    coms = running
+                    waypoints = await parseLLM(coms, drone)
+                    print(waypoints)
+                    await drone.VC_translator(waypoints)
 
             elif i_coms.lower() == "t":
 
@@ -1467,6 +1468,25 @@ async def main():
             #     print("Goodbye!")
             #     print()
             #     break
+
+            elif i_coms.lower() == "w":
+
+                
+                print("landmarks:")
+                print("table: 0.45 -2.83 2.40")
+                print("chair: 1.01 2.45 1.91")
+                print("desk: 4.03 1.27 1.33")
+                print("filing cabinet: 5.64 0.70 1.22")
+                print("board: 2.46 -0.03 1.59")
+                print("TV screen: 1.05 -2.94 0.81")
+                print("router: 2.64 0.34 0.73")
+                print("shredder: 5.38 0.98 1.29")
+                print("microphone: 3.41 -1.57 2.07")
+                print("water dispenser: 2.49 -2.60 2.49")
+                print("coffee machine: 4.01 -2.89 1.94")
+                print("cat: 1.43 0.61 0.81")
+            
+
 
             else:
                 print("Invalid command. Please try again.\n")
