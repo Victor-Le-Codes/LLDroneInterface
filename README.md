@@ -324,3 +324,15 @@ sudo pip install pyaudio
 pip install numpy==1.23.5
 pip install --upgrade transformers
 ```
+
+
+
+### Login into Hugging Face to use the Meta-Llama-3-1B-Instruct Model
+
+# Copy and paste the following info into an Ubuntu Terminal:
+
+```
+huggingface-cli login
+```
+
+After that, put in your Hugging Face Token
