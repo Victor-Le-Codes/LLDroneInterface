@@ -370,6 +370,76 @@ class DroneController:
                 print(f"Missing required parameter {e} in command: {cmd_dict}")
             except Exception as e:
                 print(f"Error executing command {cmd_dict}: {str(e)}")
+
+    # Rule-based VC Translator below for faster but basic command
+
+    async def RB_VC_translator(self, command_list):
+        """
+        Translates a list of segmented commands into drone control function calls.
+        """
+        if not command_list:
+            print("No command received.")
+            return
+        
+        print("command list:", command_list)
+        print()
+
+        i = 0
+        while i < len(command_list):
+            command = command_list[i]
+            print(command)
+            # Takeoff Command
+            if command == "takeoff":
+                await self.takeoff()
+
+            # Rotate Command (degrees)
+            elif command == "spin" or command == "rotate" and i + 1 < len(command_list):
+                try:
+                    degrees = float(command_list[i + 1])
+                    await self.rotate(degrees)
+                    i += 1
+                except ValueError:
+                    print(f"Invalid angle for rotate: {command_list[i+1]}")
+
+            # Move Command (X, Y, Z altitude)
+            elif command == "move" and i + 3 < len(command_list):
+                try:
+                    x, y, alt = float(command_list[i + 1]), float(command_list[i + 2]), float(command_list[i + 3])
+                    await self.move_to_position(x, y, alt)
+                    i += 3
+                except ValueError:
+                    print(f"Invalid move parameters: {command_list[i+1:i+4]}")
+
+            # Land Command
+            elif command == "land":
+                await self.land()
+
+            elif command == "home":
+                await self.move_to_position(0, 0, self.DEFAULT_ALTITUDE)
+                    
+
+            elif command == "hold":
+                pass
+
+            elif command == "exit":
+                await self.execute_with_timeout(self.land(), timeout=5)
+                await self.arm_disarm(False)
+                print("Exiting...")
+                break
+
+            else:
+                    print(f"Unknown command: {command}")
+                    
+            # Print position after each command
+            await asyncio.sleep(2)  # Brief pause between commands
+            print(f"Command Executed: {command}")
+            # await self.print_position()
+
+    
+
+            # Other commands as needed...
+
+            i += 1
     
     # --- Flight Movement Methods ---
     
@@ -618,21 +688,40 @@ class DroneController:
         print(f"Moving {direction} by {abs(delta):.2f}m")
         await self.move_to_position(0, 0, current_alt + delta)
     
-    async def rotate(self, degrees, speed=25):
-        """Rotate the drone by specified degrees at given speed."""
-        time_needed = abs(degrees / speed) + 2  # Buffer time
-        print(f"Rotating {degrees}° at {speed}°/sec...")
-        
-        current_yaw = await self.get_current_yaw()
-        target_yaw = current_yaw + degrees
-        
-        await self.drone.action.set_current_speed(speed)
-        await self.drone.action.goto_location(
-            *await self.get_global_position(),
-            target_yaw
+    async def rotate(self, degrees, speed=30):
+        """
+        Rotates the drone in place by sending yaw rate commands with zero velocity.
+        This avoids any linear drift.
+        """
+        print(f"Rotating {degrees}° at {speed}°/s...")
+
+        # Calculate time needed
+        direction = 1 if degrees >= 0 else -1
+        yaw_rate = speed * direction
+        duration = abs(degrees) / speed
+        interval = 0.1
+        total_loops = int(duration / interval)
+
+        try:
+            await self.drone.offboard.set_velocity_body(
+                VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
+            )
+            await self.drone.offboard.start()
+        except Exception as e:
+            print(f"[Rotate] Offboard already active or error: {e}")
+
+        for _ in range(total_loops):
+            await self.drone.offboard.set_velocity_body(
+                VelocityBodyYawspeed(0.0, 0.0, 0.0, yaw_rate)
+            )
+            await asyncio.sleep(interval)
+
+        # Stop any yaw motion
+        await self.drone.offboard.set_velocity_body(
+            VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0)
         )
-        
-        await asyncio.sleep(time_needed)
+        print(f"{degrees}° Rotation complete.")
+    
     
     async def get_current_yaw(self):
         """Get current yaw angle in degrees."""
@@ -994,7 +1083,7 @@ def recognize_speech():
 recognizer = sr.Recognizer()
 
 
-"""
+
 def RB_segment_sentence(sentence):
     # Segments the sentence into drone actions based on recognized patterns.
     # Filters out non-relevant words (like 'to', 'by', 'and', etc.) and splits multi-digit numbers,
@@ -1239,7 +1328,7 @@ def RB_segment_sentence(sentence):
     
     return processed_tokens
 
-    """
+    
 
 async def main():
     try:
@@ -1250,17 +1339,27 @@ async def main():
         print("...")
         while True:
             print("Please select a command :\n")
+            print("------- Single Command Actions -------")
             print("L. Land")
             print("TO. Take Off")
             print("S. Single Actions Command Mode (Continuous)")
+            print()
+            print("------- LLM-Based Inputs -------")
             print("V. Voice Command (One Instance)")
-            print("C. Voice Command (Run Continuously)")
+            print("C. [BETA] Voice Command (Run Continuously)")
             print("T. Text-Based Command")
+            print()
+            print("------- Rule-Based (RB) Input -------")
+            print("RBV. Rule-based Voice Command")
+            print("RBT. Rule-based Text Command")
+            print()
+            print("------- Information and Testing -------")
             print("F. Functions List")
             print("W. Waypoint List")
             print("Test. Test String")
             # print("E. Exit\n")
-            i_coms = input("Please enter a corresponding letter or Test:")
+            print()
+            i_coms = input("Please enter a corresponding letter(s) or Test:")
 
             print()
 
@@ -1432,6 +1531,8 @@ async def main():
                     print(waypoints)
                     await drone.VC_translator(waypoints)
 
+                    continue
+
             elif i_coms.lower() == "t":
 
                 coms = input("Input drone commands :")
@@ -1441,6 +1542,38 @@ async def main():
             
                 await drone.VC_translator(waypoints)
 
+                continue
+
+            elif i_coms.lower() == "rbt":
+
+                coms = input("Please put in a RB text command: ")
+
+                segments = RB_segment_sentence(coms.lower())
+
+                await drone.RB_VC_translator(segments)
+
+                await asyncio.sleep(2)  # Use asyncio.sleep instead of time.sleep
+
+                continue
+
+            elif i_coms.lower() == "rbv":
+    
+                running = True
+                while running:
+                    running = run_OneVCOnly(True)
+                    if not running:
+                        break  # Exit the loop completely when 'goodbye' is detected
+                    
+                    coms = running
+
+                    segments = RB_segment_sentence(coms.lower())
+
+                    await drone.RB_VC_translator(segments)
+                    running = False
+
+                continue
+
+
             elif i_coms.lower() == "test":
 
                 coms = test_command
@@ -1449,6 +1582,8 @@ async def main():
                 print(waypoints)
             
                 await drone.VC_translator(waypoints)
+
+                continue
 
 
             elif i_coms.lower() == "f":
@@ -1461,6 +1596,8 @@ async def main():
                 print("Home: Drone goes to its default XY position of 0, 0 with an altitude of", drone.DEFAULT_ALTITUDE, "\n")
                 print("Test: Test commands =", test_command, "\n")
                 print()
+
+                continue
 
 
             # elif coms.lower() == "e":
@@ -1485,6 +1622,8 @@ async def main():
                 print("water dispenser: 2.49 -2.60 2.49")
                 print("coffee machine: 4.01 -2.89 1.94")
                 print("cat: 1.43 0.61 0.81")
+
+                continue
             
 
 
