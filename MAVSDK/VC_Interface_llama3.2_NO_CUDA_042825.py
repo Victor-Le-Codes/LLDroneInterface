@@ -1464,11 +1464,11 @@ async def main():
 
                         sc_rotate = input("Please enter a degree value from 0 to 360 Degrees: ")
 
-                        if sc_rotate == "" or not sc_rotate.isnumeric():
+                        if sc_rotate == "":
 
-                            print("Invalid measurement. Please try again.")
-                            continue
-
+                            sc_rotate = 0
+                            
+                            sc_rotate = float(sc_rotate)
                         
                         else:
                         
